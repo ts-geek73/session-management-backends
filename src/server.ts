@@ -14,7 +14,7 @@ const CORS_ORIGINS = process.env.CORS_ORIGINS?.split(",") ?? [
 ];
 const corsOptions = {
   origin: CORS_ORIGINS,
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "OPTIONS", "PATCH"],
 };
 const app = express();
 const httpServer = createServer(app);

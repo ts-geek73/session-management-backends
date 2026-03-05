@@ -15,7 +15,6 @@ export const initWebSocket = (io: Server) => {
   client.listen("session_change", async (payload: string) => {
     try {
       const data = JSON.parse(payload);
-      console.log("📫 Postgres notification received:", data);
 
       const { eventType, new: newRow } = data;
 

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { db } from "../db/db";
 import { sessions } from "../db/schema";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export const sessionsRouter = Router();
 
@@ -41,6 +41,32 @@ sessionsRouter.post("/track", async (req: Request, res: Response) => {
     });
 
     return res.json({ success: true });
+  } catch (error: any) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+sessionsRouter.patch("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing status field" });
+  }
+
+  const allowedStatuses = ["active", "reviewed", "archived"];
+  if (!allowedStatuses.includes(status)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid status value" });
+  }
+
+  try {
+    await db.update(sessions).set({ status }).where(eq(sessions.id, id));
+
+    return res.json({ success: true, message: "Session updated" });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
   }
