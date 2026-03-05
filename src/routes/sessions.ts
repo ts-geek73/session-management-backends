@@ -81,7 +81,7 @@ sessionsRouter.patch("/:id", async (req: Request, res: Response) => {
       .json({ success: false, message: "Missing status field" });
   }
 
-  const allowedStatuses = ["active", "reviewed", "archived"];
+  const allowedStatuses = ["active", "complete"];
   if (!allowedStatuses.includes(status)) {
     return res
       .status(400)

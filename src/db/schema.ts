@@ -1,5 +1,14 @@
-import { pgTable, uuid, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  varchar,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
+export const statusEnum = pgEnum("session_status", ["active", "complete"]);
 
 export const contents = pgTable("contents", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -19,7 +28,7 @@ export const sessions = pgTable("sessions", {
   content_id: uuid("content_id")
     .references(() => contents.id, { onDelete: "cascade" })
     .notNull(),
-  status: varchar("status", { length: 50 }).default("active").notNull(),
+  status: statusEnum("status").default("active").notNull(),
   created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
