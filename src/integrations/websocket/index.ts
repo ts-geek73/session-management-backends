@@ -19,16 +19,11 @@ export const initWebSocket = (io: Server) => {
       const { eventType, new: newRow } = data;
 
       if (eventType === "INSERT" || eventType === "UPDATE") {
-        const detailedSession = await db.query.sessions.findFirst({
-          where: eq(sessions.id, (newRow as any).id),
-          with: {
-            contents: {
-              columns: {
-                title: true,
-              },
-            },
-          },
-        });
+        const [detailedSession] = await db
+          .select()
+          .from(sessions)
+          .where(eq(sessions.id, (newRow as any).id))
+          .limit(1);
 
         if (detailedSession) {
           if (eventType === "INSERT") {

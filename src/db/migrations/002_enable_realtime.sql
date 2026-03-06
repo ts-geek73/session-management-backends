@@ -15,4 +15,3 @@ DROP TRIGGER IF EXISTS trg_session_change ON sessions;
 CREATE TRIGGER trg_session_change
 AFTER INSERT OR UPDATE ON sessions
 FOR EACH ROW EXECUTE FUNCTION notify_session_change();
-

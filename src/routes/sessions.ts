@@ -7,12 +7,10 @@ export const sessionsRouter = Router();
 
 sessionsRouter.get("/", async (_req: Request, res: Response) => {
   try {
-    const data = await db.query.sessions.findMany({
-      with: {
-        contents: true,
-      },
-      orderBy: [desc(sessions.created_at)],
-    });
+    const data = await db
+      .select()
+      .from(sessions)
+      .orderBy(desc(sessions.created_at));
 
     return res.json({ success: true, data });
   } catch (error: any) {
@@ -21,19 +19,17 @@ sessionsRouter.get("/", async (_req: Request, res: Response) => {
 });
 
 sessionsRouter.post("/track", async (req: Request, res: Response) => {
-  const { content_id, status } = req.body;
+  const { pid, status } = req.body;
 
-  if (!content_id) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Missing content_id" });
+  if (!pid) {
+    return res.status(400).json({ success: false, message: "Missing pid" });
   }
 
   try {
     const [newSession] = await db
       .insert(sessions)
       .values({
-        content_id,
+        pid,
         status: status || "active",
         created_at: new Date(),
       })
@@ -52,20 +48,19 @@ sessionsRouter.get("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const data = await db.query.sessions.findFirst({
-      where: eq(sessions.id, id),
-      with: {
-        contents: true,
-      },
-    });
+    const data = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, id))
+      .limit(1);
 
-    if (!data) {
+    if (data.length === 0) {
       return res
         .status(404)
         .json({ success: false, message: "Session not found" });
     }
 
-    return res.json({ success: true, data });
+    return res.json({ success: true, data: data[0] });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
   }
